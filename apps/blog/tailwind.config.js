@@ -2,10 +2,9 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     container: {
@@ -17,13 +16,18 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Palette Growi
+        // Palette Growi - Unifiée avec globals.css
         growi: {
           lime: '#B4DD7F',      // Vert lime
           forest: '#1E5631',    // Vert sapin
-          sand: '#F9F7E8',      // Beige sable
+          sand: '#F9F7E8',      // Beige sable (renommé pour cohérence)
           sun: '#F6C445',       // Jaune soleil
         },
+        // Aliases pour compatibility avec le CSS existant
+        lime: '#B4DD7F',
+        forest: '#1E5631',
+        beige: '#F9F7E8',
+        sun: '#F6C445',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

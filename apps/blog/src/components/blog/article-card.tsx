@@ -16,11 +16,11 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
   return (
     <article className={`group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:border-growi-lime ${isCompact ? 'h-full' : ''}`}>
       {/* Hero Image */}
-      {article.heroImageUrl && (
+      {article.imageUrl && (
         <div className="relative aspect-[16/9] overflow-hidden">
           <Image
-            src={article.heroImageUrl}
-            alt={article.heroImageAlt || article.title}
+            src={article.imageUrl}
+            alt={article.title || article.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -42,13 +42,13 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
             {article.author.avatar && (
               <Image
                 src={article.author.avatar}
-                alt={article.author.displayName}
+                alt={article.author.name}
                 width={24}
                 height={24}
                 className="rounded-full"
               />
             )}
-            <span>{article.author.displayName}</span>
+            <span>{article.author.name}</span>
           </div>
           
           {article.publishedAt && (
@@ -57,10 +57,10 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
             </time>
           )}
           
-          {article.readingTimeMin && (
+          {article.readingTime && (
             <span className="flex items-center gap-1">
               <span>📖</span>
-              {formatReadingTime(article.readingTimeMin)}
+              {formatReadingTime(article.readingTime)}
             </span>
           )}
         </div>
@@ -73,9 +73,9 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
         </h2>
 
         {/* Subtitle */}
-        {article.subtitle && (
+        {article.excerpt && (
           <p className={`text-gray-600 mb-3 ${isCompact ? 'text-sm line-clamp-2' : ''}`}>
-            {article.subtitle}
+            {article.excerpt}
           </p>
         )}
 
@@ -101,9 +101,9 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
         )}
 
         {/* Subcategory */}
-        {article.subcategory && (
+        {article.category && (
           <div className="text-xs text-growi-forest font-medium mb-3">
-            {article.subcategory.name}
+            {article.category.name}
           </div>
         )}
 
@@ -127,7 +127,7 @@ export function ArticleCard({ article, variant = 'compact' }: ArticleCardProps) 
           {/* View count */}
           <div className="flex items-center gap-1 text-xs text-gray-400">
             <span>👁️</span>
-            <span>{article.viewCount}</span>
+            <span>{article.views}</span>
           </div>
         </div>
       </div>

@@ -29,6 +29,9 @@ RUN npm run build:api
 FROM base AS production
 WORKDIR /app
 
+# Install OpenSSL dependencies for Prisma
+RUN apk add --no-cache openssl-dev openssl libc6-compat
+
 ENV NODE_ENV=production
 ENV PORT=3000
 
@@ -54,6 +57,9 @@ CMD ["node", "dist/main.js"]
 # Development stage
 FROM base AS development
 WORKDIR /app
+
+# Install OpenSSL dependencies for Prisma
+RUN apk add --no-cache openssl-dev openssl libc6-compat
 
 # Install all dependencies including devDependencies
 COPY package*.json ./

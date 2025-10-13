@@ -42,12 +42,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   };
 
   // Récupérer les données
-  const [articlesResponse, categories] = await Promise.all([
+  const [articlesResponse, categoriesResponse] = await Promise.all([
     getArticles(queryParams),
     getCategories(),
   ]);
 
-  const { data: articles, meta } = articlesResponse;
+  const articles = articlesResponse.data || [];
+  const meta = articlesResponse.meta || { page: 1, pageSize: 12, total: 0, totalPages: 0 };
+  const categories = categoriesResponse || [];
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -42,7 +42,14 @@ export class BlogController {
       query.tags = [query.tags];
     }
 
-    return this.blogService.getArticles(query);
+    // Convertir les paramètres numériques
+    const processedQuery: BlogQuery = {
+      ...query,
+      page: query.page ? +query.page : 1,
+      pageSize: query.pageSize ? +query.pageSize : 10,
+    };
+
+    return this.blogService.getArticles(processedQuery);
   }
 
   @Get('articles/:slug')

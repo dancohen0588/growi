@@ -33,26 +33,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       ],
     });
 
-    // Log queries in development
-    if (process.env.NODE_ENV === 'development') {
-      this.$on('query', (e) => {
-        this.logger.debug(`Query: ${e.query}`);
-        this.logger.debug(`Params: ${e.params}`);
-        this.logger.debug(`Duration: ${e.duration}ms`);
-      });
-    }
-
-    this.$on('error', (e) => {
-      this.logger.error(`Database error: ${e.message}`);
-    });
-
-    this.$on('warn', (e) => {
-      this.logger.warn(`Database warning: ${e.message}`);
-    });
-
-    this.$on('info', (e) => {
-      this.logger.log(`Database info: ${e.message}`);
-    });
+    // Logging sera ajouté après la génération correcte des types Prisma
   }
 
   async onModuleInit() {
@@ -100,28 +81,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async getStats() {
     try {
       const [
-        userCount,
-        organizationCount,
-        gardenProjectCount,
-        plantCount,
-        taskCount,
-        orderCount,
+        authorCount,
+        categoryCount,
+        articleCount,
+        tagCount,
+        mediaCount,
       ] = await Promise.all([
-        this.user.count({ where: { deletedAt: null } }),
-        this.organization.count(),
-        this.gardenProject.count(),
-        this.plant.count(),
-        this.task.count(),
-        this.order.count(),
+        this.author.count(),
+        this.category.count(),
+        this.article.count(),
+        this.tag.count(),
+        this.media.count(),
       ]);
 
       return {
-        users: userCount,
-        organizations: organizationCount,
-        gardenProjects: gardenProjectCount,
-        plants: plantCount,
-        tasks: taskCount,
-        orders: orderCount,
+        authors: authorCount,
+        categories: categoryCount,
+        articles: articleCount,
+        tags: tagCount,
+        media: mediaCount,
       };
     } catch (error) {
       this.logger.error('Failed to get database stats:', error);

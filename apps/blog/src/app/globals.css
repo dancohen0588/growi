@@ -8,6 +8,17 @@
   --growi-sand: #F9F7E8;
   --growi-sun: #F6C445;
   
+  /* Variables CSS étendues pour reproduire le design original */
+  --green-lime: #B4DD7F;
+  --green-forest: #1E5631;
+  --beige-sand: #F9F7E8;
+  --yellow-sun: #F6C445;
+  --container-max-width: 1200px;
+  --border-radius: 12px;
+  --border-radius-large: 20px;
+  --transition: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
+  
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
@@ -57,8 +68,13 @@
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: #F9F7E8;
+  color: #1E5631;
+  font-family: 'Raleway', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Growi custom styles */
@@ -183,4 +199,133 @@ body {
 /* Focus styles for accessibility */
 .focus-visible {
   @apply outline-none ring-2 ring-growi-lime ring-offset-2;
+}
+
+/* =============================================
+   STYLES PERSONNALISÉS POUR REPRODUIRE INDEX.HTML
+   ============================================= */
+
+/* Boutons avec gradients et effets comme l'original */
+.growi-button-primary {
+  background: linear-gradient(135deg, var(--green-lime) 0%, var(--green-forest) 100%);
+  box-shadow: 0 4px 15px rgba(180, 221, 127, 0.3);
+  transition: var(--transition);
+}
+
+.growi-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(180, 221, 127, 0.4);
+}
+
+.growi-button-secondary {
+  background: transparent;
+  border: 2px solid var(--green-forest);
+  transition: var(--transition);
+}
+
+.growi-button-secondary:hover {
+  background: var(--green-forest);
+  color: white;
+}
+
+/* Hero section avec gradient background */
+.growi-hero-bg {
+  background: linear-gradient(135deg, var(--beige-sand) 0%, white 100%);
+}
+
+/* Phone mockup avec ombres sophistiquées */
+.growi-phone-mockup {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+}
+
+/* Cards avec hover effects */
+.growi-step-card {
+  background: var(--beige-sand);
+  border-radius: var(--border-radius-large);
+  transition: var(--transition);
+}
+
+.growi-step-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(180, 221, 127, 0.15);
+}
+
+.growi-feature-card {
+  border: 2px solid var(--beige-sand);
+  border-radius: var(--border-radius-large);
+  transition: var(--transition);
+}
+
+.growi-feature-card:hover {
+  border-color: var(--green-lime);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(180, 221, 127, 0.2);
+}
+
+/* Testimonial cards */
+.growi-testimonial-card {
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  border-radius: var(--border-radius-large);
+  transition: var(--transition);
+}
+
+.growi-testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Header avec backdrop blur */
+.growi-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(180, 221, 127, 0.2);
+}
+
+/* Pro section background */
+.growi-pro-bg {
+  background: var(--green-forest);
+}
+
+/* Final CTA background */
+.growi-final-cta-bg {
+  background: linear-gradient(135deg, var(--beige-sand) 0%, white 100%);
+}
+
+/* Store badges hover effect */
+.growi-store-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Check icons avec background lime */
+.growi-check-icon {
+  background: var(--green-lime);
+  border-radius: 50%;
+}
+
+/* App screens mockup */
+.growi-app-screens {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border-radius: 30px;
+}
+
+/* Responsive typography avec clamp */
+.growi-hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.2;
+}
+
+.growi-hero-subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.6;
+}
+
+.growi-section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+/* Avatar avec bordure lime */
+.growi-avatar {
+  border: 4px solid var(--green-lime);
+  border-radius: 50%;
 }
