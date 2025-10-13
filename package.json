@@ -1,0 +1,72 @@
+{
+  "name": "growi-blog-monorepo",
+  "version": "1.0.0",
+  "description": "Growi Blog - Assistant de jardinage intelligent - Blog complet",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:blog\"",
+    "dev:api": "npm run dev --workspace=@growi/api",
+    "dev:blog": "npm run dev --workspace=@growi/blog",
+    "build": "npm run build --workspaces",
+    "build:api": "npm run build --workspace=@growi/api",
+    "build:blog": "npm run build --workspace=@growi/blog",
+    "test": "npm run test --workspaces",
+    "test:blog": "npm run test --workspace=@growi/blog",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "npm run typecheck --workspaces",
+    "db:generate": "npm run db:generate --workspace=@growi/api",
+    "db:migrate": "npm run db:migrate --workspace=@growi/api",
+    "db:migrate:dev": "npm run db:migrate:dev --workspace=@growi/api",
+    "db:seed": "npm run db:seed --workspace=@growi/api",
+    "db:reset": "npm run db:reset --workspace=@growi/api",
+    "db:studio": "npm run db:studio --workspace=@growi/api",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:clean": "docker compose down -v --remove-orphans",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "growi",
+    "blog",
+    "jardinage",
+    "nextjs",
+    "nestjs",
+    "typescript",
+    "tailwindcss"
+  ],
+  "author": "Growi Team",
+  "license": "MIT"
+}

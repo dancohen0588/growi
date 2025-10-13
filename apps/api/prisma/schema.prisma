@@ -1,0 +1,228 @@
+// Growi Blog - Schema Prisma complet
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// BLOG - AUTHORS
+// =============================================
+
+model Author {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  displayName String
+  email       String   @unique
+  bio         String?
+  avatar      String?
+  website     String?
+  twitter     String?
+  linkedin    String?
+  instagram   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  articles Article[]
+
+  @@map("authors")
+  @@index([slug])
+  @@index([email])
+  @@index([isActive])
+}
+
+// =============================================
+// BLOG - CATEGORIES
+// =============================================
+
+model Category {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  description String?
+  color       String?  // Hex color for UI
+  icon        String?  // Icon name or emoji
+  seoTitle    String?
+  seoDescription String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subcategories Subcategory[]
+  articles      Article[]
+
+  @@map("categories")
+  @@index([slug])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// =============================================
+// BLOG - SUBCATEGORIES
+// =============================================
+
+model Subcategory {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  description String?
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  articles Article[]
+
+  @@map("subcategories")
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// =============================================
+// BLOG - TAGS
+// =============================================
+
+model Tag {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  color     String?  // Hex color for UI
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  articles Article[]
+
+  @@map("tags")
+  @@index([slug])
+  @@index([isActive])
+}
+
+// =============================================
+// BLOG - ARTICLES
+// =============================================
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id              String        @id @default(uuid())
+  slug            String        @unique
+  title           String
+  subtitle        String?
+  excerpt         String?       // Auto-generated or manual (180-220 chars)
+  contentMarkdown String        // Markdown content
+  contentHtml     String?       // Generated HTML
+  heroImageUrl    String?
+  heroImageAlt    String?
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  // Content metadata
+  readingTimeMin  Int?          // Calculated reading time
+  tableOfContents Json?         // Extracted TOC from H2 headings
+  keyTakeaways    String[]      // "À retenir" bullet points
+  
+  // Publishing
+  status          ArticleStatus @default(DRAFT)
+  publishedAt     DateTime?
+  featuredUntil   DateTime?     // Featured article until date
+  viewCount       Int           @default(0)
+  
+  // Relations
+  authorId        String
+  author          Author        @relation(fields: [authorId], references: [id])
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  subcategoryId   String?
+  subcategory     Subcategory?  @relation(fields: [subcategoryId], references: [id])
+  tags            Tag[]
+  media           Media[]
+  views           ArticleView[]
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("articles")
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([featuredUntil])
+  @@index([viewCount])
+}
+
+// =============================================
+// BLOG - MEDIA
+// =============================================
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+model Media {
+  id          String    @id @default(uuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int       // File size in bytes
+  type        MediaType
+  url         String
+  thumbnailUrl String?
+  alt         String?
+  caption     String?
+  width       Int?
+  height      Int?
+  
+  // Relations
+  articleId   String?
+  article     Article?  @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("media")
+  @@index([type])
+  @@index([articleId])
+  @@index([mimeType])
+}
+
+// =============================================
+// BLOG - ANALYTICS
+// =============================================
+
+model ArticleView {
+  id        String   @id @default(uuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  referer   String?
+  viewedAt  DateTime @default(now())
+
+  @@map("article_views")
+  @@index([articleId])
+  @@index([viewedAt])
+}

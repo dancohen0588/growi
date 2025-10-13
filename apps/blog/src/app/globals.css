@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --growi-lime: #B4DD7F;
+  --growi-forest: #1E5631;
+  --growi-sand: #F9F7E8;
+  --growi-sun: #F6C445;
+  
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 142 69% 58%;
+  --primary-foreground: 142 100% 11%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 142 69% 58%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 142 69% 58%;
+  --primary-foreground: 142 100% 11%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 142 69% 58%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Growi custom styles */
+.growi-gradient {
+  background: linear-gradient(135deg, var(--growi-lime) 0%, var(--growi-forest) 100%);
+}
+
+.growi-text-gradient {
+  background: linear-gradient(135deg, var(--growi-lime) 0%, var(--growi-forest) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Article content styles */
+.article-content h2 {
+  @apply text-2xl font-bold text-growi-forest font-poppins mt-8 mb-4 border-b border-growi-sand pb-2;
+}
+
+.article-content h3 {
+  @apply text-xl font-semibold text-growi-forest font-poppins mt-6 mb-3;
+}
+
+.article-content p {
+  @apply text-gray-700 leading-relaxed mb-4;
+}
+
+.article-content ul, .article-content ol {
+  @apply text-gray-700 leading-relaxed mb-4 ml-6;
+}
+
+.article-content li {
+  @apply mb-2;
+}
+
+.article-content blockquote {
+  @apply bg-growi-sand border-l-4 border-growi-lime p-4 rounded-r-lg mb-6 italic;
+}
+
+.article-content blockquote p {
+  @apply text-growi-forest font-medium mb-2 last:mb-0;
+}
+
+.article-content code {
+  @apply bg-growi-sand text-growi-forest px-2 py-1 rounded text-sm font-medium;
+}
+
+.article-content pre {
+  @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6;
+}
+
+.article-content pre code {
+  @apply bg-transparent text-gray-100 p-0;
+}
+
+.article-content strong {
+  @apply font-semibold text-growi-forest;
+}
+
+/* Table of Contents styles */
+.toc-link {
+  @apply text-gray-600 hover:text-growi-forest transition-colors;
+}
+
+.toc-link.active {
+  @apply text-growi-forest font-medium border-l-2 border-growi-lime pl-3;
+}
+
+/* Key Takeaways box */
+.key-takeaways {
+  @apply bg-growi-sand border border-growi-lime rounded-xl p-6 mb-8;
+}
+
+.key-takeaways h4 {
+  @apply text-growi-forest font-semibold font-poppins text-lg mb-4 flex items-center gap-2;
+}
+
+.key-takeaways ul {
+  @apply space-y-2 text-growi-forest;
+}
+
+.key-takeaways li {
+  @apply flex items-start gap-3;
+}
+
+.key-takeaways li::before {
+  content: "✓";
+  @apply text-growi-lime font-bold text-lg flex-shrink-0;
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile menu */
+.mobile-menu {
+  @apply fixed inset-0 z-50 bg-white md:hidden;
+  @apply transform transition-transform duration-300;
+}
+
+.mobile-menu.closed {
+  @apply translate-x-full;
+}
+
+/* Loading states */
+.loading {
+  @apply animate-pulse;
+}
+
+/* Focus styles for accessibility */
+.focus-visible {
+  @apply outline-none ring-2 ring-growi-lime ring-offset-2;
+}
