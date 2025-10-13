@@ -17,7 +17,7 @@ import { BlogService, BlogQuery } from './blog.service';
 import { AdminGuard } from '../auth/guards/admin.guard';
 
 @ApiTags('Blog')
-@Controller('v1/blog')
+@Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 

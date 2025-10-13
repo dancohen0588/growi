@@ -226,3 +226,82 @@ model ArticleView {
   @@index([articleId])
   @@index([viewedAt])
 }
+
+// =============================================
+// AUTHENTICATION - USERS
+// =============================================
+
+enum UserRole {
+  USER
+  EDITOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+model User {
+  id              String     @id @default(uuid())
+  email           String     @unique
+  passwordHash    String
+  firstName       String?
+  lastName        String?
+  role            UserRole   @default(USER)
+  status          UserStatus @default(ACTIVE)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  refreshTokens   RefreshToken[]
+  passwordResets  PasswordReset[]
+
+  @@map("users")
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// =============================================
+// AUTHENTICATION - REFRESH TOKENS
+// =============================================
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@index([revoked])
+}
+
+// =============================================
+// AUTHENTICATION - PASSWORD RESETS
+// =============================================
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("password_resets")
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@index([used])
+}

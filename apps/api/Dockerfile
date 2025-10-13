@@ -61,15 +61,13 @@ WORKDIR /app
 # Install OpenSSL dependencies for Prisma
 RUN apk add --no-cache openssl-dev openssl libc6-compat
 
-# Install all dependencies including devDependencies
-COPY package*.json ./
-COPY apps/api/package*.json ./apps/api/
-RUN npm install
-
-# Copy source code
+# Copy source code first (needed for Prisma schema)
 COPY . .
 
-# Generate Prisma client
+# Install all dependencies including devDependencies
+RUN npm install
+
+# Generate Prisma client (redundant but safe)
 RUN npx prisma generate --schema=./apps/api/prisma/schema.prisma
 
 EXPOSE 3000

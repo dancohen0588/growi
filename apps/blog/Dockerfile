@@ -56,13 +56,11 @@ CMD ["node", "server.js"]
 FROM base AS development
 WORKDIR /app
 
-# Install all dependencies including devDependencies
-COPY package*.json ./
-COPY apps/blog/package*.json ./apps/blog/
-RUN npm install
-
-# Copy source code
+# Copy source code first (needed for workspace)
 COPY . .
+
+# Install all dependencies including devDependencies
+RUN npm install
 
 EXPOSE 3001
 

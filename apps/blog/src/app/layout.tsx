@@ -3,6 +3,7 @@ import { Poppins, Raleway } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/ui/navbar'
 import Footer from '@/components/ui/footer'
+import { AuthProvider } from '@/lib/auth'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -42,13 +43,15 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${poppins.variable} ${raleway.variable}`}>
       <body className="min-h-screen bg-growi-sand font-raleway text-growi-forest antialiased">
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )

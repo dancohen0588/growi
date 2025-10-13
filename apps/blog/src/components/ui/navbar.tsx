@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { useAuth, usePermissions } from '@/lib/auth'
 
 interface NavItem {
   label: string
@@ -61,13 +62,10 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <Link
-            href="#download"
-            className="hidden md:inline-flex bg-growi-lime hover:bg-growi-forest text-white font-medium px-6 py-2 rounded-lg transition-colors"
-          >
-            Télécharger l'app
-          </Link>
+          {/* Auth Section */}
+          <div className="hidden md:flex items-center gap-4">
+            <AuthSection />
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -99,17 +97,223 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href="#download"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="bg-growi-lime text-white font-medium px-6 py-2 rounded-lg text-center mt-2"
-              >
-                Télécharger l'app
-              </Link>
+              {/* Auth Section Mobile */}
+              <div className="mt-4 pt-4 border-t border-growi-sand">
+                <AuthSectionMobile onClose={() => setIsMobileMenuOpen(false)} />
+              </div>
             </nav>
           </div>
         )}
       </div>
     </header>
+  )
+}
+
+// Composant d'authentification pour desktop
+function AuthSection() {
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const { isAdmin } = usePermissions()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  if (isLoading) {
+    return (
+      <div className="w-6 h-6 animate-pulse bg-growi-sand rounded-full"></div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center gap-3">
+        <Link
+          href="/login"
+          className="text-growi-forest hover:text-growi-lime font-medium transition-colors"
+        >
+          Se connecter
+        </Link>
+        <Link
+          href="/register"
+          className="bg-gradient-to-r from-growi-lime to-growi-forest text-white font-medium px-6 py-2 rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+        >
+          Créer un compte
+        </Link>
+      </div>
+    )
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setIsMenuOpen(false)
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error)
+    }
+  }
+
+  const getInitials = (user: any) => {
+    const firstName = user.firstName || ''
+    const lastName = user.lastName || ''
+    if (firstName && lastName) {
+      return `${firstName[0]}${lastName[0]}`.toUpperCase()
+    }
+    return user.email[0].toUpperCase()
+  }
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="flex items-center gap-3 hover:bg-growi-sand px-3 py-2 rounded-xl transition-colors"
+      >
+        <div className="w-8 h-8 bg-gradient-to-r from-growi-lime to-growi-forest text-white rounded-full flex items-center justify-center text-sm font-bold">
+          {getInitials(user)}
+        </div>
+        <div className="hidden lg:block text-left">
+          <div className="text-sm font-medium text-growi-forest">
+            {user.firstName && user.lastName
+              ? `${user.firstName} ${user.lastName}`
+              : user.email
+            }
+          </div>
+          <div className="text-xs text-gray-500 capitalize">
+            {user.role.toLowerCase()}
+          </div>
+        </div>
+        <svg
+          className={`w-4 h-4 text-gray-500 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Menu dropdown */}
+      {isMenuOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-growi-sand rounded-xl shadow-lg z-50">
+          <div className="py-2">
+            <div className="px-4 py-2 border-b border-growi-sand">
+              <div className="text-sm font-medium text-growi-forest">
+                {user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.email
+                }
+              </div>
+              <div className="text-xs text-gray-500">{user.email}</div>
+            </div>
+            
+            <Link
+              href="/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand transition-colors"
+            >
+              🏠 Tableau de bord
+            </Link>
+            
+            {isAdmin && (
+              <Link
+                href="/admin/users"
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand transition-colors"
+              >
+                ⚙️ Administration
+              </Link>
+            )}
+            
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+              🚪 Se déconnecter
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Composant d'authentification pour mobile
+function AuthSectionMobile({ onClose }: { onClose: () => void }) {
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const { isAdmin } = usePermissions()
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center">
+        <div className="w-6 h-6 animate-pulse bg-growi-sand rounded-full"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Link
+          href="/login"
+          onClick={onClose}
+          className="text-center py-3 text-growi-forest hover:text-growi-lime font-medium transition-colors"
+        >
+          Se connecter
+        </Link>
+        <Link
+          href="/register"
+          onClick={onClose}
+          className="bg-gradient-to-r from-growi-lime to-growi-forest text-white font-medium px-6 py-3 rounded-xl text-center hover:shadow-lg transition-all duration-300"
+        >
+          Créer un compte
+        </Link>
+      </div>
+    )
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      onClose()
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="px-4 py-2 bg-growi-sand rounded-xl">
+        <div className="text-sm font-medium text-growi-forest">
+          {user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user.email
+          }
+        </div>
+        <div className="text-xs text-gray-500 capitalize">
+          {user.role.toLowerCase()}
+        </div>
+      </div>
+      
+      <Link
+        href="/dashboard"
+        onClick={onClose}
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand rounded-xl transition-colors"
+      >
+        🏠 Tableau de bord
+      </Link>
+      
+      {isAdmin && (
+        <Link
+          href="/admin/users"
+          onClick={onClose}
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand rounded-xl transition-colors"
+        >
+          ⚙️ Administration
+        </Link>
+      )}
+      
+      <button
+        onClick={handleLogout}
+        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+      >
+        🚪 Se déconnecter
+      </button>
+    </div>
   )
 }
