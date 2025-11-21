@@ -30,9 +30,9 @@ export default function HomePage() {
             
             {/* Mockup Phone */}
             <div className="relative flex justify-center items-center">
-              <div className="relative z-10 bg-white p-5 w-80 h-96 rounded-3xl shadow-2xl">
+              <div className="relative z-10 bg-white p-5 w-full max-w-4xl h-[500px] rounded-3xl shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1556075798-4825dfaaf498?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+                  src="/homepage.jpg"
                   alt="Growi app mockup"
                   className="w-full h-full object-cover rounded-2xl"
                 />

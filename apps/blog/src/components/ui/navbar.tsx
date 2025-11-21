@@ -15,6 +15,7 @@ const navItems: NavItem[] = [
   { label: 'Fonctionnalités', href: '/#fonctionnalites' },
   { label: 'Premium', href: '/#premium' },
   { label: 'Blog', href: '/blog' },
+  { label: 'Bible des plantes', href: '/bible-des-plantes' },
   { label: 'Pro', href: '/#pro' },
   { label: 'Contact', href: '/contact' },
 ]
@@ -26,6 +27,9 @@ export default function Navbar() {
   const isActive = (href: string) => {
     if (href === '/blog') {
       return pathname.startsWith('/blog')
+    }
+    if (href === '/bible-des-plantes') {
+      return pathname.startsWith('/bible-des-plantes')
     }
     return pathname === href
   }
@@ -203,11 +207,11 @@ function AuthSection() {
             </div>
             
             <Link
-              href="/dashboard"
+              href="/mes-projets"
               onClick={() => setIsMenuOpen(false)}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand transition-colors"
             >
-              🏠 Tableau de bord
+              🌿 Mes projets
             </Link>
             
             {isAdmin && (
@@ -291,11 +295,11 @@ function AuthSectionMobile({ onClose }: { onClose: () => void }) {
       </div>
       
       <Link
-        href="/dashboard"
+        href="/mes-projets"
         onClick={onClose}
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-growi-sand rounded-xl transition-colors"
       >
-        🏠 Tableau de bord
+        🌿 Mes projets
       </Link>
       
       {isAdmin && (

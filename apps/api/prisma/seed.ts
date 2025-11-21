@@ -1,4 +1,5 @@
 import { PrismaClient, ArticleStatus } from '@prisma/client';
+import { seedGardenData } from './seeds/garden.seed';
 
 const prisma = new PrismaClient();
 
@@ -520,6 +521,13 @@ Un jardin zéro phyto, c'est un écosystème qui vit en harmonie !
   articles.forEach((article, index) => {
     console.log(`  ${index + 1}. "${article.title}" (/${article.slug})`);
   });
+
+  // Seed garden data
+  console.log('\n🌱 Seeding garden data...');
+  await seedGardenData();
+  
+  // TODO: Seed plant species for Bible des plantes via CSV import
+  console.log('\n📚 Plant species seeding disponible via import CSV');
 }
 
 main()

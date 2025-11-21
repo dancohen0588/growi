@@ -258,6 +258,14 @@ model User {
   // Relations
   refreshTokens   RefreshToken[]
   passwordResets  PasswordReset[]
+  
+  // Garden relations
+  profile         UserProfile?
+  gardenProjects  GardenProject[]
+  gardens         Garden[]
+  activities      Activity[]
+  reminders       Reminder[]
+  alerts          Alert[]
 
   @@map("users")
   @@index([email])
@@ -305,3 +313,684 @@ model PasswordReset {
   @@index([expiresAt])
   @@index([used])
 }
+
+// =============================================
+// GARDEN - ENUMS
+// =============================================
+
+enum KnowledgeLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+enum MainObjective {
+  AESTHETIC
+  PRODUCTIVE_GARDEN
+  BIODIVERSITY
+  LOW_MAINTENANCE
+  OTHER
+}
+
+enum EnvironmentType {
+  URBAN
+  RURAL
+  BALCONY
+  TERRACE
+  HOUSE
+  SECOND_HOME
+}
+
+enum SoilType {
+  CLAY
+  CALCAREOUS
+  SANDY
+  SILTY
+  LOAMY
+}
+
+enum SoilPh {
+  ACID
+  NEUTRAL
+  ALKALINE
+}
+
+enum Exposure {
+  FULL_SUN
+  PART_SHADE
+  SHADE
+}
+
+enum Orientation {
+  NORTH
+  SOUTH
+  EAST
+  WEST
+}
+
+enum Slope {
+  FLAT
+  SLIGHT
+  STEEP
+}
+
+enum Drainage {
+  POOR
+  NORMAL
+  EXCELLENT
+}
+
+enum IrrigationType {
+  MANUAL
+  DRIP
+  AUTOMATIC
+  NONE
+}
+
+enum PlantType {
+  TREE
+  SHRUB
+  FLOWER
+  VEGETABLE
+  HERB
+  LAWN
+  VINE
+  SUCCULENT
+  OTHER
+}
+
+enum PlantCycle {
+  ANNUAL
+  PERENNIAL
+  BIENNIAL
+  EVERGREEN
+  DECIDUOUS
+}
+
+enum WaterNeed {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ActivityType {
+  WATERING
+  PRUNING
+  FERTILIZING
+  TREATMENT
+  HARVEST
+  REPOTTING
+  SOWING
+  TRANSPLANTING
+  OBSERVATION
+  DISEASE
+  PEST
+}
+
+enum ReminderStatus {
+  PENDING
+  DONE
+  SKIPPED
+  CANCELLED
+}
+
+enum DataSource {
+  API
+  SENSOR
+  MANUAL
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum BudgetRange {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ProductionUse {
+  SELF_CONSUMPTION
+  AESTHETIC
+  SALE
+}
+
+// =============================================
+// PLANT BIBLE - ENUMS
+// =============================================
+
+enum PlantEnvironmentType {
+  INDOOR
+  OUTDOOR
+  MIXED
+}
+
+enum PlantBibleCategory {
+  SHRUB
+  TREE
+  PERENNIAL
+  ANNUAL
+  CLIMBING
+  BULB
+  HERB
+  VEGETABLE
+  GROUNDCOVER
+  HEDGE
+  SUCCULENT
+  AQUATIC
+  FERN
+  GRASS
+}
+
+enum FrenchClimate {
+  OCEANIC
+  CONTINENTAL
+  MEDITERRANEAN
+  MOUNTAIN
+  SEMI_CONTINENTAL
+}
+
+enum DifficultyLevel {
+  VERY_EASY
+  EASY
+  INTERMEDIATE
+  EXPERT
+}
+
+enum GrowthSpeed {
+  SLOW
+  MEDIUM
+  FAST
+}
+
+enum LightRequirement {
+  SHADE
+  PARTIAL_SHADE
+  SUN
+  FULL_SUN
+}
+
+enum WateringFrequency {
+  VERY_LOW
+  LOW
+  MODERATE
+  HIGH
+}
+
+enum SoilTypePreference {
+  DRAINING
+  CLAY
+  LIMESTONE
+  NEUTRAL
+  RICH
+  POOR
+  SANDY
+  HUMUS
+}
+
+enum SoilPHPreference {
+  ACID
+  NEUTRAL
+  BASIC
+}
+
+enum HumidityLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum LifespanType {
+  ANNUAL
+  BIENNIAL
+  PERENNIAL
+  PERSISTENT
+}
+
+enum FoliageType {
+  EVERGREEN
+  DECIDUOUS
+  SEMI_EVERGREEN
+}
+
+enum PruningType {
+  LIGHT
+  FORMATION
+  REJUVENATION
+  FRUITING
+  NONE
+}
+
+// =============================================
+// GARDEN - USER PROFILE
+// =============================================
+
+model UserProfile {
+  id                      String         @id @default(uuid())
+  userId                  String         @unique
+  user                    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Knowledge and preferences
+  knowledgeLevel          KnowledgeLevel @default(BEGINNER)
+  mainObjective           MainObjective  @default(AESTHETIC)
+  timePerWeekMinutes      Int?           // Time available per week in minutes
+  budgetRange             BudgetRange?
+  budgetMonthlyEstimate   Float?         // Monthly budget estimate in euros
+  
+  // Tools and equipment
+  tools                   String[]       // List of available tools
+  hasIrrigation           Boolean        @default(false)
+  hasMower                Boolean        @default(false)
+  hasCompost              Boolean        @default(false)
+  
+  // Context
+  hasProfessionalGardener Boolean        @default(false)
+  constraints             String[]       // Constraints (absences, etc.)
+  productionUse           ProductionUse  @default(AESTHETIC)
+  environmentType         EnvironmentType?
+  
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  @@map("user_profiles")
+  @@index([userId])
+}
+
+// =============================================
+// GARDEN - PROJECTS
+// =============================================
+
+model GardenProject {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  coverImageUrl   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  gardens         Garden[]
+
+  @@map("garden_projects")
+  @@index([userId])
+}
+
+// =============================================
+// GARDEN - GARDENS
+// =============================================
+
+model Garden {
+  id                    String          @id @default(uuid())
+  projectId             String
+  project               GardenProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId                String
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                  String
+  
+  // Location
+  city                  String
+  postalCode            String
+  country               String?         @default("FR")
+  latitude              Float?
+  longitude             Float?
+  
+  // Garden characteristics
+  totalAreaM2           Float?
+  soilType              SoilType?
+  soilPh                SoilPh?
+  exposureMain          Orientation?    // Main orientation of the garden
+  slope                 Slope?
+  drainage              Drainage?
+  
+  // Infrastructure
+  hasWaterPoint         Boolean         @default(false)
+  irrigationType        IrrigationType?
+  hasPets               Boolean         @default(false)
+  hasVegetableGarden    Boolean         @default(false)
+  hasOrchard            Boolean         @default(false)
+  hasGreenhouse         Boolean         @default(false)
+  environmentType       EnvironmentType?
+  
+  // Garden plan
+  planWidthPx           Int?            // Plan width in pixels
+  planHeightPx          Int?            // Plan height in pixels
+  planBackgroundImageUrl String?        // Background image for the plan
+  
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  // Relations
+  zones                 GardenZone[]
+  plants                Plant[]
+  activities            Activity[]
+  reminders             Reminder[]
+  environmentalSnapshots EnvironmentalSnapshot[]
+  alerts                Alert[]
+
+  @@map("gardens")
+  @@index([projectId])
+  @@index([userId])
+  @@index([city])
+  @@index([postalCode])
+}
+
+// =============================================
+// GARDEN - ZONES
+// =============================================
+
+model GardenZone {
+  id                String    @id @default(uuid())
+  gardenId          String
+  garden            Garden    @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  name              String
+  exposure          Exposure?
+  shadePercent      Int?      // Percentage of shade (0-100)
+  shape             Json      // Polygon coordinates normalized 0-1
+  
+  // Soil overrides
+  overrideSoilType  SoilType?
+  overrideSoilPh    SoilPh?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  plants            Plant[]
+
+  @@map("garden_zones")
+  @@index([gardenId])
+  @@unique([gardenId, name])
+}
+
+// =============================================
+// GARDEN - PLANTS
+// =============================================
+
+model Plant {
+  id                    String        @id @default(uuid())
+  gardenId              String
+  garden                Garden        @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  zoneId                String?
+  zone                  GardenZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  
+  // Plant identification
+  scientificName        String?
+  commonName            String
+  plantType             PlantType
+  cycle                 PlantCycle?
+  
+  // Planting info
+  plantedAt             DateTime?
+  estimatedAgeMonths    Int?
+  
+  // Location (normalized coordinates 0-1)
+  location              Json          // Point or polygon coordinates
+  exposure              Exposure?
+  
+  // Care requirements
+  waterNeed             WaterNeed?
+  wateringFrequencyDays Int?          // Watering frequency in days
+  wateringType          IrrigationType?
+  substrate             String?       // Type of substrate/soil mix
+  
+  // Status and media
+  photosUrls            String[]      // Array of photo URLs
+  isAlive               Boolean       @default(true)
+  notes                 String?
+  history               Json?         // Disease history, treatments, etc.
+  
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Relations
+  activities            Activity[]
+  reminders             Reminder[]
+  alerts                Alert[]
+
+  @@map("plants")
+  @@index([gardenId])
+  @@index([zoneId])
+  @@index([isAlive])
+  @@unique([gardenId, commonName])
+}
+
+// =============================================
+// GARDEN - ACTIVITIES
+// =============================================
+
+model Activity {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gardenId    String
+  garden      Garden       @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  plantId     String?
+  plant       Plant?       @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  
+  type        ActivityType
+  occurredAt  DateTime
+  quantity    Float?       // Quantity (liters, grams, etc.)
+  unit        String?      // Unit of measurement
+  notes       String?
+  photoUrls   String[]     // Array of photo URLs
+  meta        Json?        // Additional structured data
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("activities")
+  @@index([userId])
+  @@index([gardenId])
+  @@index([plantId])
+  @@index([occurredAt])
+  @@index([type])
+}
+
+// =============================================
+// GARDEN - REMINDERS
+// =============================================
+
+model Reminder {
+  id          String         @id @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gardenId    String?
+  garden      Garden?        @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  plantId     String?
+  plant       Plant?         @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  status      ReminderStatus @default(PENDING)
+  nextAt      DateTime
+  rrule       String?        // RRULE for recurring reminders
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("reminders")
+  @@index([userId])
+  @@index([gardenId])
+  @@index([plantId])
+  @@index([nextAt])
+  @@index([status])
+}
+
+// =============================================
+// GARDEN - ENVIRONMENTAL DATA
+// =============================================
+
+model EnvironmentalSnapshot {
+  id              String     @id @default(uuid())
+  gardenId        String
+  garden          Garden     @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  recordedAt      DateTime
+  
+  // Temperature
+  tempMinC        Float?     // Minimum temperature in Celsius
+  tempMaxC        Float?     // Maximum temperature in Celsius
+  tempAvgC        Float?     // Average temperature in Celsius
+  
+  // Other metrics
+  soilHumidityPct Float?     // Soil humidity percentage
+  uvIndex         Float?     // UV index
+  rainfallMm      Float?     // Rainfall in mm
+  frostRisk       Boolean?   // Risk of frost
+  windSpeedKph    Float?     // Wind speed in km/h
+  sunshineHours   Float?     // Hours of sunshine
+  
+  // Metadata
+  source          DataSource @default(API)
+  raw             Json?      // Raw data from API/sensor
+  
+  createdAt       DateTime   @default(now())
+
+  @@map("environmental_snapshots")
+  @@index([gardenId])
+  @@index([recordedAt])
+  @@index([source])
+}
+
+// =============================================
+// GARDEN - ALERTS
+// =============================================
+
+model Alert {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gardenId        String?
+  garden          Garden?   @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  plantId         String?
+  plant           Plant?    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  
+  code            String    // Alert code (e.g., "FROST_WARNING", "OVERWATERING")
+  severity        Severity
+  message         String
+  data            Json?     // Additional alert data
+  acknowledgedAt  DateTime?
+  
+  createdAt       DateTime  @default(now())
+
+  @@map("alerts")
+  @@index([userId])
+  @@index([gardenId])
+  @@index([plantId])
+  @@index([severity])
+  @@index([acknowledgedAt])
+}
+
+// =============================================
+// PLANT BIBLE - SPECIES DATABASE
+// =============================================
+
+model PlantSpecies {
+  id                        String                  @id @default(uuid())
+  
+  // Identité
+  slug                      String                  @unique
+  commonNameFr              String                  // Nom commun français (ex: "Rosier", "Laurier-rose")
+  commonNameEn              String?                 // Nom commun anglais (optionnel)
+  latinName                 String                  // Nom latin scientifique
+  aliases                   String[]                // Autres noms communs
+  
+  // Typologie / catégories
+  plantEnvironmentType      PlantEnvironmentType    // intérieure, extérieure, mixte
+  category                  PlantBibleCategory      // arbuste, arbre, vivace, etc.
+  usageTags                 String[]                // ornementale, haie, potager, balcon, massif, rocaille, ombre, brise-vue
+  difficultyLevel           DifficultyLevel         // très facile, facile, intermédiaire, expert
+  growthSpeed               GrowthSpeed             // lente, moyenne, rapide
+  matureHeightCm            Int?                    // Hauteur à maturité en cm
+  matureWidthCm             Int?                    // Largeur à maturité en cm
+  
+  // Adaptation aux climats français
+  suitableClimatesFr        FrenchClimate[]         // climats français adaptés
+  hardinessMinTempC         Int?                    // température mini supportée (°C)
+  coastalTolerance          Boolean                 @default(false) // supporte embruns / vent
+  urbanTolerance            Boolean                 @default(false) // supporte pollution / chaleur urbaine
+  
+  // Conditions de culture
+  lightNeeds                LightRequirement        // ombre, mi-ombre, soleil, plein soleil
+  wateringFrequency         WateringFrequency       // très faible, faible, modérée, importante
+  wateringNotes             String?                 // fréquence précise : ex 1x/semaine en été
+  soilTypes                 SoilTypePreference[]    // drainant, argileux, calcaire, neutre, riche, pauvre, sablonneux, humifère
+  soilPh                    SoilPHPreference?       // acide, neutre, basique
+  humidityNeeds             HumidityLevel           // faible, moyenne, élevée
+  hardinessZoneNote         String?                 // texte libre pour préciser zones ou altitudes
+  
+  // Calendrier & entretien
+  plantingPeriod            Int[]                   // mois de plantation [3,4,5]
+  floweringPeriod           Int[]                   // mois de floraison [1-12]
+  harvestPeriod             Int[]                   // mois de récolte (optionnel)
+  pruningPeriod             Int[]                   // mois de taille (optionnel)
+  repottingFrequencyYears   Int?                    // fréquence de rempotage en années
+  fertilizationPeriod       String?                 // période de fertilisation
+  maintenanceTasksSummary   String?                 // résumé des tâches annuelles
+  pruningType               PruningType             // type de taille + notes
+  pruningNotes              String?
+  coldProtectionNeeded      Boolean                 @default(false)
+  coldProtectionNotes       String?
+  
+  // Santé de la plante
+  commonDiseases            String[]                // oïdium, mildiou, tavelure, rouille, etc.
+  commonPests               String[]                // pucerons, cochenilles, acariens, limaces, etc.
+  diseaseSymptoms           String?                 // comment reconnaître les problèmes
+  recommendedTreatments     String?                 // traitements possibles : biologiques en priorité
+  wateringMistakesSymptoms  String?                 // feuilles jaunes si trop d'eau, etc.
+  
+  // Sécurité & toxicité
+  toxicToHumans             Boolean                 @default(false)
+  toxicToPets               Boolean                 @default(false)
+  toxicityNotes             String?                 // parties toxiques, symptômes, précautions
+  
+  // Association & implantation
+  companionPlantsIds        String[]                // IDs des plantes compagnes
+  incompatiblePlantsIds     String[]                // IDs des plantes incompatibles
+  recommendedUsesText       String?                 // idées d'implantation dans jardin français
+  
+  // Caractéristiques botaniques
+  lifespanType              LifespanType            // annuelle, bisannuelle, vivace, persistante
+  foliageType               FoliageType             // persistant, caduc, semi-persistant
+  notesForBeginners         String?                 // conseils très concrets pour débutant
+  
+  // SEO
+  seoTitle                  String?
+  seoDescription            String?
+  
+  // Images (placeholder pour futur upload)
+  images                    String[]                // URLs des images
+  
+  // Métadonnées
+  isActive                  Boolean                 @default(true)
+  createdAt                 DateTime                @default(now())
+  updatedAt                 DateTime                @updatedAt
+
+  @@map("plant_species")
+  
+  // Index de performance pour recherche
+  @@index([slug])
+  @@index([commonNameFr])
+  @@index([latinName])
+  @@index([category])
+  @@index([plantEnvironmentType])
+  @@index([difficultyLevel])
+  @@index([suitableClimatesFr])
+  @@index([lightNeeds])
+  @@index([wateringFrequency])
+  @@index([isActive])
+  @@index([createdAt])
+  
+  // Index composés pour recherche avancée
+  @@index([category, difficultyLevel])
+  @@index([plantEnvironmentType, category])
+  @@index([difficultyLevel, lightNeeds])
+}
+
+// =============================================
+// UPDATED USER MODEL - ADD GARDEN RELATIONS
+// =============================================

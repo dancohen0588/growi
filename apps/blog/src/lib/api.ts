@@ -228,7 +228,15 @@ class ApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        // Essayer de lire le message d'erreur depuis la réponse JSON
+        try {
+          const errorData = await response.json()
+          const errorMessage = errorData.message || errorData.error || response.statusText
+          throw new Error(errorMessage)
+        } catch (jsonError) {
+          // Si on ne peut pas lire le JSON, utiliser le statusText
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
       }
 
       return response
@@ -347,18 +355,20 @@ class ApiClient {
 
   // Inscription
   async register(data: RegisterData): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/api/v1/auth/register', {
+    const response = await this.request<{ data: AuthResponse }>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(data)
     })
+    return response.data
   }
 
   // Connexion
   async login(data: LoginData): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/api/v1/auth/login', {
+    const response = await this.request<{ data: AuthResponse }>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(data)
     })
+    return response.data
   }
 
   // Refresh des tokens
@@ -379,7 +389,8 @@ class ApiClient {
 
   // Profil utilisateur
   async getProfile(): Promise<UserProfile> {
-    return this.request<UserProfile>('/api/v1/auth/me')
+    const response = await this.request<{ data: UserProfile }>('/api/v1/auth/me')
+    return response.data
   }
 
   // Demande de reset mot de passe

@@ -5,10 +5,10 @@ import { randomBytes } from 'crypto';
 @Injectable()
 export class PasswordService {
   /**
-   * Hash un mot de passe avec bcrypt (saltRounds = 12 pour plus de sécurité)
+   * Hash un mot de passe avec bcrypt (saltRounds optimisé pour dev/prod)
    */
   async hashPassword(password: string): Promise<string> {
-    const saltRounds = 12;
+    const saltRounds = process.env.NODE_ENV === 'development' ? 10 : 12;
     return bcrypt.hash(password, saltRounds);
   }
 

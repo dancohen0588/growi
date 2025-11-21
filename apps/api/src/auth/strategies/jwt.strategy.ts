@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -7,6 +7,8 @@ import { JwtPayload } from '../../common/services/jwt.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
@@ -16,6 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: configService.get('JWT_SECRET'),
     });
+    
+    this.logger.log(`[JWT_STRATEGY] Initialized with secret: ${configService.get('JWT_SECRET') ? '✅ SET' : '❌ NOT SET'}`);
   }
 
   /**
@@ -23,6 +27,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Cette méthode est appelée automatiquement par Passport
    */
   async validate(payload: JwtPayload) {
+    this.logger.log(`[JWT_STRATEGY] Validating payload: ${JSON.stringify(payload)}`);
+    
     const { sub: userId, email, role } = payload;
 
     // Vérifier que l'utilisateur existe toujours et est actif
@@ -38,13 +44,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       },
     });
 
+    this.logger.log(`[JWT_STRATEGY] User found: ${user ? '✅ YES' : '❌ NO'}`);
+    
     if (!user) {
+      this.logger.error(`[JWT_STRATEGY] User not found for userId: ${userId}`);
       throw new UnauthorizedException('Utilisateur introuvable');
     }
 
+    this.logger.log(`[JWT_STRATEGY] User status: ${user.status}`);
+    
     if (user.status !== 'ACTIVE') {
+      this.logger.error(`[JWT_STRATEGY] Inactive user status: ${user.status}`);
       throw new UnauthorizedException('Compte utilisateur inactif');
     }
+
+    this.logger.log(`[JWT_STRATEGY] ✅ Validation successful for user: ${user.email}`);
 
     // Retourner l'utilisateur qui sera attaché à req.user
     return {

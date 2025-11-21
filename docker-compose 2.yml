@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: growi-blog-postgres
+    environment:
+      POSTGRES_DB: growi_blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: development
+    container_name: growi-blog-api
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/growi_blog
+      - ADMIN_TOKEN=dev_admin_token
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run start:dev
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/api/src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./apps/api/package.json
+
+  blog:
+    build:
+      context: .
+      dockerfile: apps/blog/Dockerfile
+      target: development
+    container_name: growi-blog-frontend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - PORT=3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/blog:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    command: npm run dev
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/blog/src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./apps/blog/package.json
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: growi-blog-network

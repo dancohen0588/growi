@@ -1,0 +1,64 @@
+# Database
+DATABASE_URL="postgresql://postgres:postgres123@localhost:5432/growi"
+
+# Redis
+REDIS_URL="redis://localhost:6379"
+
+# JWT Secrets
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key-change-this-in-production"
+JWT_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
+
+# OAuth Providers
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+APPLE_CLIENT_ID="your-apple-client-id"
+APPLE_CLIENT_SECRET="your-apple-client-secret"
+
+# S3/MinIO Storage
+S3_ENDPOINT="http://localhost:9000"
+S3_ACCESS_KEY="minioadmin"
+S3_SECRET_KEY="minioadmin123"
+S3_BUCKET="growi-uploads"
+S3_REGION="us-east-1"
+
+# SMTP/Email
+SMTP_HOST="localhost"
+SMTP_PORT=1025
+SMTP_USER=""
+SMTP_PASSWORD=""
+SMTP_FROM="noreply@growi.io"
+
+# API Configuration
+API_PORT=3000
+API_URL="http://localhost:3000"
+API_PREFIX="api/v1"
+
+# Frontend URLs
+FRONTEND_URL="http://localhost:3001"
+ADMIN_URL="http://localhost:3001"
+
+# NextAuth (Admin)
+NEXTAUTH_URL="http://localhost:3001"
+NEXTAUTH_SECRET="your-super-secret-nextauth-key-change-this-in-production"
+
+# External Services
+WEATHER_API_KEY="your-weather-api-key"
+STRIPE_SECRET_KEY="sk_test_your-stripe-secret-key"
+STRIPE_WEBHOOK_SECRET="whsec_your-webhook-secret"
+
+# Rate Limiting
+RATE_LIMIT_TTL=60
+RATE_LIMIT_LIMIT=100
+
+# Internationalization
+DEFAULT_LOCALE="fr"
+SUPPORTED_LOCALES="fr,en"
+
+# Logging
+LOG_LEVEL="debug"
+LOG_FILE="logs/growi.log"
+
+# Development
+NODE_ENV="development"

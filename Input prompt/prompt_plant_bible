@@ -1,0 +1,250 @@
+Tu es un assistant de développement full-stack senior.  
+Ta mission : concevoir et implémenter une fonctionnalité complète "Bible des plantes" pour l'application Growi.
+
+=====================
+🎯 OBJECTIF GÉNÉRAL
+=====================
+Construire une base documentaire ultra complète d’au moins 500 espèces de plantes très courantes (jardin, balcon, intérieur), avec un focus particulier sur celles adaptées aux différents climats français.  
+Cette base doit être :
+- Consultable côté front via une entrée de menu "Bible des plantes".
+- Recherchable par nom + filtrable par catégories / critères.
+- Administrable côté back-office (CRUD complet).
+- Testée end-to-end avec Playwright.
+
+Tu utiliseras le stack standard recommandé par Roo (front + back + base de données + tests E2E).
+
+================================
+📚 MODÈLE DE DONNÉES "PLANTE"
+================================
+Créer un modèle de données "Plant" (table / collection) avec au minimum les champs suivants :
+
+Identité
+- id (clé primaire)
+- slug (unique, dérivé du nom commun/fr, pour l’URL)
+- common_name_fr : nom commun en français (ex : "Rosier", "Laurier-rose")
+- common_name_en (optionnel)
+- latin_name : nom latin
+- aliases : autres noms communs (liste de string)
+
+Typologie / catégories
+- plant_type : {intérieure, extérieure, mixte}
+- category : {arbuste, arbre, vivace, annuelle, grimpante, bulbe, plante d’intérieur, plante aromatique, plante potagère, couvre-sol, haie, etc.} (type enum ou tags)
+- usage_tags : liste de tags {ornementale, haie, potager, balcon, massif, rocaille, ombre, brise-vue, etc.}
+- difficulty_level : {très facile, facile, intermédiaire, expert}
+- growth_speed : {lente, moyenne, rapide}
+- mature_height_cm / mature_width_cm (nombre)
+
+Adaptation aux climats français
+- suitable_climates_fr : liste de valeurs parmi {océanique, continental, méditerranéen, montagnard, semi-continental}
+- hardiness_min_temp_c : température mini supportée (°C)
+- coastal_tolerance : booléen (supporte embruns / vent)
+- urban_tolerance : booléen (supporte pollution / chaleur urbaine)
+
+Conditions de culture
+- light_needs : {ombre, mi-ombre, soleil, plein soleil}
+- watering_frequency : {très faible, faible, modérée, importante}
+- watering_notes : texte court (fréquence précise : ex 1x/semaine en été, etc.)
+- soil_type : liste {drainant, argileux, calcaire, neutre, riche, pauvre, sablonneux, humifère}
+- soil_ph : {acide, neutre, basique}
+- humidity_needs : {faible, moyenne, élevée}
+- hardiness_zone_note : texte libre pour préciser les zones ou altitudes
+
+Calendrier & entretien
+- planting_period : texte ou structure indiquant les mois de plantation (ex : [3,4,5])
+- flowering_period : liste de mois (1-12)
+- harvest_period (pour potagères / fruitiers) : liste de mois (optionnel)
+- pruning_period : liste de mois (optionnel)
+- repotting_frequency_years (pour plantes en pot)
+- fertilization_period : texte ou liste de mois
+- maintenance_tasks_summary : texte (les grandes lignes des tâches à l’année)
+- pruning_type : {taille légère, de formation, de rajeunissement, de fructification, aucune} + notes
+- cold_protection_needed : booléen + cold_protection_notes
+
+Santé de la plante
+- common_diseases : liste (oïdium, mildiou, tavelure, rouille, etc.)
+- common_pests : liste (pucerons, cochenilles, acariens, limaces, etc.)
+- disease_symptoms : texte (comment reconnaître les problèmes)
+- recommended_treatments : texte (traitements possibles : biologiques en priorité)
+- watering_mistakes_symptoms : texte (ex : feuilles jaunes si trop d’eau, etc.)
+
+Sécurité & toxicité
+- toxic_to_humans : booléen
+- toxic_to_pets : booléen
+- toxicity_notes : texte (parties toxiques, symptômes, précautions)
+
+Association & implantation
+- companion_plants : liste de slugs/ids d’autres plantes recommandées
+- incompatible_plants : liste de slugs/ids (facultatif)
+- recommended_uses_text : texte (idées d’implantation dans un jardin français : massif, haie, potager, balcon, etc.)
+
+Divers
+- lifespan_type : {annuelle, bisannuelle, vivace, persistante, caduc}
+- foliage_type : {persistant, caduc, semi-persistant}
+- notes_for_beginners : texte (conseils très concrets pour débutant)
+- seo_title : string
+- seo_description : string
+- created_at, updated_at
+
+Prévoir **dès maintenant** un champ optionnel
+- images (liste d’URLs)  
+mais NE PAS implémenter l’upload pour l’instant (placeholder uniquement pour plus tard).
+
+==========================================
+🧩 FONCTIONNALITÉS FRONT – "BIBLE DES PLANTES"
+==========================================
+1) Entrée de navigation
+- Ajouter dans le menu principal une entrée "Bible des plantes".
+- Cette entrée mène à une page de listing / recherche.
+
+2) Page liste / recherche
+Objectif : permettre à un utilisateur débutant de retrouver facilement une plante et de filtrer le catalogue.
+
+Composants clés :
+- Barre de recherche texte :
+  - Recherche par nom commun FR, nom latin, alias.
+  - Recherche full-text, insensible à la casse, tolérance aux accents.
+- Filtres (facettes) :
+  - Catégorie (arbuste, arbre, vivace, etc.)
+  - Type (intérieur, extérieur, mixte)
+  - Climat français adapté (océanique, continental, méditerranéen, montagnard, semi-continental)
+  - Exposition (ombre, mi-ombre, soleil, plein soleil)
+  - Besoin en eau (très faible → importante)
+  - Niveau de difficulté
+  - Usage (ornementale, haie, potager, balcon, etc.)
+  - Toxicité (non toxique / toxique animaux / toxique humains)
+- Résultats :
+  - Afficher sous forme de cartes / lignes : nom commun FR, nom latin, type, climat(s) recommandés, exposition, difficulté.
+  - Pagination ou chargement progressif.
+- Tri :
+  - Tri par ordre alphabétique (par défaut)
+  - Tri par niveau de difficulté (facile → difficile)
+  - Tri par adaptation au climat sélectionné (si un climat est filtré).
+
+3) Page détail "fiche plante"
+Créer une page détaillée par plante, accessible via une URL du type :
+- /bible-des-plantes/[slug]
+
+Contenu minimal de la fiche :
+- En-tête :
+  - Nom commun FR, nom latin, catégories, type, difficulté.
+- Bloc "Adaptée à votre jardin en France" :
+  - Liste des climats français compatibles + éventuelle mise en avant si la plante est "facile" dans la plupart des régions.
+- Bloc "Conditions de culture" :
+  - Exposition, besoin en eau, type de sol, pH, rusticité (température mini), notes sur le climat.
+- Bloc "Calendrier d’entretien" (mois sur une ligne de 1 à 12) :
+  - Plantation, floraison, taille, fertilisation, récolte (si applicable).
+- Bloc "Entretien & gestes clés" :
+  - maintenance_tasks_summary
+  - pruning_type + explications
+  - notes_for_beginners
+- Bloc "Santé" :
+  - maladies fréquentes, ravageurs, symptômes, traitements recommandés.
+- Bloc "Sécurité" :
+  - champs de toxicité + toxicity_notes.
+- Bloc "Associations & idées d’implantation" :
+  - Texte explicatif + éventuellement liste de companion_plants (liens vers leurs fiches).
+
+UX :
+- Toutes les informations doivent être présentées de façon claire et pédagogique, orientée débutant.
+
+====================================
+🛠️ ESPACE ADMIN – "BIBLE DES PLANTES"
+====================================
+Créer une section spécifique dans l’admin :  
+- Menu : "Bible des plantes"
+
+Fonctionnalités admin :
+1) Liste des plantes
+- Tableau avec colonnes : nom commun FR, nom latin, catégorie, type, difficulté, climats, updated_at.
+- Recherche par nom.
+- Filtres par catégorie, type, climat, difficulté.
+- Actions : créer, éditer, supprimer (CRUD).
+
+2) Formulaire de création / édition
+- Formulaire avec tous les champs décrits dans le modèle de données, regroupés par sections :
+  - Identité
+  - Catégories & usages
+  - Climat & conditions de culture
+  - Calendrier & entretien
+  - Santé
+  - Sécurité
+  - Associations
+  - SEO
+- Validations :
+  - common_name_fr, latin_name, slug obligatoires.
+  - slug unique.
+  - Listes (climats, catégories, etc.) contrôlées via enums / listes prédéfinies.
+  - Vérifier cohérence des périodes (mois entre 1 et 12).
+- Afficher les messages d’erreur de manière claire.
+
+3) Suppression
+- Suppression avec confirmation.
+- Si certaines plantes sont liées comme companion_plants, gérer proprement la suppression (soit suppression des références, soit validation bloquante avec message).
+
+=====================================
+🌱 SEED INITIAL DE 500 ESPÈCES MIN.
+=====================================
+- Prévoir un mécanisme de seed de la base de données pour créer au moins 500 plantes.
+- Le but : avoir une "Bible des plantes" suffisamment riche dès le départ.
+- Ces données peuvent être des placeholders réalistes, mais structurellement cohérents avec le modèle.
+- Prévoir la possibilité de re-exécuter le seed en évitant les doublons (par exemple via un flag ou un check sur le slug).
+
+==================================
+🔍 RECHERCHE & PERFORMANCE
+==================================
+- Implémenter une recherche performante côté back (index sur nom commun, nom latin, slug).
+- Ajouter les index nécessaires pour les principaux filtres (catégorie, type, climats, difficulté).
+- Prévoir un mécanisme de pagination efficace (limit/offset ou cursor).
+
+========================
+✅ QUALITÉ & DOCUMENTATION
+========================
+- Documenter :
+  - Le modèle de données "Plant".
+  - Les endpoints (ou services) pour :
+    - Liste + recherche + filtres.
+    - Détail plante.
+    - CRUD admin.
+  - Les commandes de seed.
+- Ajouter quelques exemples d’objets "Plant" complets dans la documentation.
+
+=========================================
+🧪 TESTS END-TO-END AVEC PLAYWRIGHT
+=========================================
+À LA FIN DU DÉVELOPPEMENT, tu dois impérativement :
+
+1) Configurer Playwright pour le projet (si ce n’est pas déjà fait par Roo).
+2) Écrire des tests E2E couvrant au minimum :
+
+Front "Bible des plantes"
+- Test 1 : accès à la page "Bible des plantes" via le menu, affichage de la liste, présence d’au moins une carte de plante.
+- Test 2 : recherche par nom commun → vérifier que les résultats contiennent la plante recherchée et excluent celles qui ne correspondent pas.
+- Test 3 : filtrage par climat français (ex : "méditerranéen") → vérifier que toutes les plantes retournées contiennent ce climat dans suitable_climates_fr.
+- Test 4 : navigation vers une fiche plante (/bible-des-plantes/[slug]) → vérifier l’affichage des sections principales (adaptation climat, conditions de culture, calendrier, santé, sécurité).
+
+Admin "Bible des plantes"
+- Test 5 : accès à la liste admin "Bible des plantes" (en supposant un mécanisme d’auth déjà existant ou mocké).
+- Test 6 : création d’une nouvelle plante depuis l’admin :
+  - Remplir le formulaire avec des données valides.
+  - Soumettre et vérifier que la plante apparaît dans la liste admin et dans la liste publique front.
+- Test 7 : édition d’une plante :
+  - Modifier un champ (ex : difficulty_level) et vérifier la mise à jour côté admin et côté front.
+- Test 8 : suppression d’une plante :
+  - Supprimer une plante de test et vérifier qu’elle n’apparaît plus ni dans la liste admin, ni dans la liste publique.
+
+3) Fournir les instructions dans le README pour lancer les tests Playwright, par exemple :
+   - Installation des dépendances.
+   - Commande pour lancer les tests E2E.
+
+================
+🎯 DÉFINITION DE FIN
+================
+La mission est terminée lorsque :
+- Le modèle "Plant" est en place avec tous les champs décrits.
+- Le front "Bible des plantes" propose :
+  - Une page de liste avec recherche + filtres + tri.
+  - Une page de détail pour chaque plante.
+- L’admin permet de créer / éditer / supprimer des plantes.
+- La base contient un seed d’au moins 500 plantes.
+- Les tests E2E Playwright décrits ci-dessus sont implémentés et passent.
+- La documentation minimale (README + description des endpoints) est fournie.

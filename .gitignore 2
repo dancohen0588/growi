@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+
+# Node / monorepo
+node_modules/
+npm-debug.log*
+pnpm-lock.yaml
+yarn.lock
+
+# Build / frameworks
+dist/
+build/
+.next/
+coverage/
+
+# Env & local
+.env
+.env.local
+.env.*.local

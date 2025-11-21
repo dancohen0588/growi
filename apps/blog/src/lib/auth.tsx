@@ -19,10 +19,26 @@ const ACCESS_TOKEN_KEY = 'growi_access_token'
 const REFRESH_TOKEN_KEY = 'growi_refresh_token'
 const USER_KEY = 'growi_user'
 
+// Helper pour gérer les cookies
+const setCookie = (name: string, value: string, days: number = 7) => {
+  if (typeof document !== 'undefined') {
+    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
+    document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`
+  }
+}
+
+const removeCookie = (name: string) => {
+  if (typeof document !== 'undefined') {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/`
+  }
+}
+
 const storage = {
   setItem: (key: string, value: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(key, value)
+      // Synchroniser avec les cookies pour le middleware
+      setCookie(key, value)
     }
   },
   getItem: (key: string): string | null => {
@@ -34,6 +50,8 @@ const storage = {
   removeItem: (key: string) => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(key)
+      // Supprimer aussi le cookie
+      removeCookie(key)
     }
   },
 }
